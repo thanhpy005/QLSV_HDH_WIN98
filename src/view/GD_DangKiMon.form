@@ -1,0 +1,320 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package view;
+
+import controller.TienTrinhDAO;
+import controller.TkbDAO;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Properties;
+import javax.swing.AbstractCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import model.LichHoc;
+import model.SinhVien;
+import model.TienTrinh;
+
+/**
+ *
+ * @author ThanhNguyen
+ */
+public class GD_DangKiMon extends javax.swing.JFrame implements ActionListener{
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GD_DangKiMon.class.getName());
+    private DefaultTableModel model;
+    private ArrayList list; // Sá»¬A: Ä?Ã£ xÃ³a Generics
+    private SinhVien sinhVien;
+    /**
+     * Creates new form GD_DangKiMon
+     */
+    public GD_DangKiMon(SinhVien s) {
+        initComponents();
+        pack();
+        Properties prop = new Properties();
+        try {
+            InputStream input = getClass().getResourceAsStream("/config.properties");
+            if(input != null) {
+                prop.load(input);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String bgColor = prop.getProperty("backgroundColor", "255,255,255"); // default tráº¯ng
+        String[] rgb = bgColor.split(",");
+        int r = Integer.parseInt(rgb[0].trim());
+        int g = Integer.parseInt(rgb[1].trim());
+        int b = Integer.parseInt(rgb[2].trim());
+
+    
+        getContentPane().setBackground(new Color(r, g, b));
+        sinhVien = s;
+        RefreshButton.addActionListener(this);
+        BackButton.addActionListener(this);
+        list  = new TienTrinhDAO().getTienTrinh2KiHoc(s);
+        
+        // Sá»¬A: Ä?Ã£ thay tháº¿ vÃ²ng láº·p for-each
+        for(int j = 0; j < list.size(); j++)
+        {
+            TienTrinh i = (TienTrinh) list.get(j); // Sá»¬A: Cáº§n Ã©p kiá»ƒu
+            TenMonCheckBox.addItem(i.getTenMon());
+        }
+        model = (DefaultTableModel) MonHocTable.getModel();
+        model.setColumnIdentifiers(new Object[]{
+            "MÃ£ mÃ´n","TÃªn mÃ´n","PhÃ²ng Há»?c","Tiáº¿t báº¯t Ä‘áº§u","Sá»‘ tiáº¿t","Thá»©","Thá»?i gian","Thao tÃ¡c"
+        });
+        
+    }
+    public String getMaMon(String s)
+    {
+        String res = "";
+        String[] a = s.split("\\s+");
+        
+        // Sá»¬A: Ä?Ã£ thay tháº¿ vÃ²ng láº·p for-each
+        for(int k = 0; k < a.length; k++)
+        {
+            res += Character.toUpperCase(a[k].charAt(0));
+        }
+        return res;
+        
+    }
+    public void ShowData()
+    {
+        int[] haitiet = {1,7};
+        int[] batiet = {3,9};
+        for(int i = 2; i <= 7; i++) // VÃ²ng láº·p nÃ y OK
+        {
+            // Sá»¬A: Ä?Ã£ thay tháº¿ vÃ²ng láº·p for-each
+            for(int h = 0; h < haitiet.length; h++)
+            {
+                int j = haitiet[h];
+                model.addRow(new Object[]{
+                    getMaMon(TenMonCheckBox.getSelectedItem().toString()),
+                    TenMonCheckBox.getSelectedItem().toString(),
+                    String.valueOf(j) + "0" + String.valueOf(TenMonCheckBox.getSelectedIndex()+1),
+                    new Integer(j), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    new Integer(2), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    new Integer(i), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    (sinhVien.getSchoolYear() % 2 == 0)? "Tá»« 01/02 Ä‘áº¿n 31/05" : "Tá»« 15/08 Ä‘áº¿n 31/12",
+                    "Ä?Äƒng kÃ­"
+                });
+            }
+            
+            // Sá»¬A: Ä?Ã£ thay tháº¿ vÃ²ng láº·p for-each
+            for(int b = 0; b < batiet.length; b++)
+            {
+                int j = batiet[b];
+                model.addRow(new Object[]{
+                    getMaMon(TenMonCheckBox.getSelectedItem().toString()),
+                    TenMonCheckBox.getSelectedItem().toString(),
+                    String.valueOf(j) + "0" + String.valueOf(TenMonCheckBox.getSelectedIndex()+1),
+                    new Integer(j), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    new Integer(3), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    new Integer(i), // Sá»¬A: Boxing thá»§ cÃ´ng
+                    (sinhVien.getSchoolYear() % 2 == 0)? "Tá»« 01/02 Ä‘áº¿n 31/05" : "Tá»« 15/08 Ä‘áº¿n 31/12",
+                    "Ä?Äƒng kÃ­"
+                });
+            }
+            
+        }
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    // @SuppressWarnings("unchecked") // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        TenMonCheckBox = new javax.swing.JComboBox(); // Sá»¬A: Ä?Ã£ xÃ³a Diamond Operator <>
+        RefreshButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        MonHocTable = new javax.swing.JTable();
+        BackButton = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout()); // Tá»?T! Ä?Ã£ dÃ¹ng AbsoluteLayout
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Ä?Ä‚NG KÃ? MÃ”N Há»ŒC");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 957, 66));
+
+        jLabel2.setText("TÃªn mÃ´n:");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(253, 81, -1, -1));
+
+        getContentPane().add(TenMonCheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(315, 78, 299, -1));
+
+        RefreshButton.setText("Refresh");
+        getContentPane().add(RefreshButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(632, 78, -1, -1));
+
+        MonHocTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(MonHocTable);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 119, 957, -1));
+
+        BackButton.setText("Back");
+        getContentPane().add(BackButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(857, 550, -1, -1));
+
+        pack();
+    }// </editor-fold>                        
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+    // S?A: L?y m?ng LookAndFeel ra tru?c
+    javax.swing.UIManager.LookAndFeelInfo[] lafInfos = javax.swing.UIManager.getInstalledLookAndFeels();
+    
+    // S?A: Dùng vòng l?p for truy?n th?ng v?i ch? s? 'i'
+    for (int i = 0; i < lafInfos.length; i++) {
+        // S?A: L?y ph?n t? th? 'i' b?ng tay
+        javax.swing.UIManager.LookAndFeelInfo info = lafInfos[i];
+        
+        // Logic bên trong gi? nguyên
+        if ("Nimbus".equals(info.getName())) {
+            javax.swing.UIManager.setLookAndFeel(info.getClassName());
+            break;
+        }
+    }
+    // Các kh?i catch c?a b?n dã dúng, gi? nguyên
+} catch (ClassNotFoundException ex) {
+    logger.log(java.util.logging.Level.SEVERE, null, ex);
+} catch (InstantiationException ex) {
+    logger.log(java.util.logging.Level.SEVERE, null, ex);
+} catch (IllegalAccessException ex) {
+    logger.log(java.util.logging.Level.SEVERE, null, ex);
+} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+    logger.log(java.util.logging.Level.SEVERE, null, ex);
+}
+        
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton BackButton;
+    private javax.swing.JTable MonHocTable;
+    private javax.swing.JButton RefreshButton;
+    private javax.swing.JComboBox TenMonCheckBox; // Sá»¬A: Ä?Ã£ xÃ³a Generics
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    // End of variables declaration                   
+    
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    public void actionPerformed(ActionEvent e)
+    {
+        if(e.getSource().equals(RefreshButton)) btnRefreshButtonClick();
+        else btnBackButtonClick();
+    }
+    public void btnRefreshButtonClick()
+    {
+        model.setRowCount(0);
+        ShowData();
+        int columIndex = 7;
+        MonHocTable.getColumnModel().getColumn(columIndex).setCellRenderer(new ButtonRenderer2());
+        MonHocTable.getColumnModel().getColumn(columIndex).setCellEditor(new ButtonEditor2(sinhVien));
+        
+    }
+    public void btnBackButtonClick()
+    {
+        GD_Menu_SV winD_Menu_SV = new GD_Menu_SV(sinhVien);
+        winD_Menu_SV.setLocationRelativeTo(null);
+        winD_Menu_SV.setVisible(true);
+        this.dispose();
+    }
+}
+class ButtonRenderer2 extends JButton implements TableCellRenderer
+{
+    public ButtonRenderer2()
+    {
+        setOpaque(true);
+        
+    }
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    public Component getTableCellRendererComponent(JTable table,Object value,boolean isSelected, boolean hasFocus,int row, int column)
+    {
+        setText((value == null)? "Ä?Äƒng kÃ­": value.toString());
+        return this;
+    }
+}
+class ButtonEditor2 extends AbstractCellEditor implements TableCellEditor, ActionListener
+{
+    private JButton button;
+    private JTable table;
+    private int currentRow;
+    private SinhVien sinhVien;
+    public ButtonEditor2(SinhVien s)
+    {
+        sinhVien =s;
+        button = new JButton("Ä?Äƒng kÃ­");
+        button.setOpaque(true);
+        button.addActionListener(this);
+    }
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    public Component getTableCellEditorComponent(JTable table, Object value,boolean isSelected, int row, int column)
+    {
+        this.table = table;
+        this.currentRow = row;
+        button.setText((value == null)? "Ä?Äƒng kÃ­":value.toString());
+        return button;
+    }
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    public Object getCellEditorValue()
+    {
+        return button.getText();
+    }
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    public void actionPerformed(ActionEvent e)
+    {
+        LichHoc l = new LichHoc();
+        l.setId(sinhVien.getId());
+        l.setMamon(table.getValueAt(currentRow, 0).toString());
+        l.setTenmon(table.getValueAt(currentRow, 1).toString());
+        l.setPhonghoc(table.getValueAt(currentRow, 2).toString());
+        l.setTietBatDau(Integer.parseInt(table.getValueAt(currentRow, 3).toString()));
+        l.setSoTiet(Integer.parseInt(table.getValueAt(currentRow, 4).toString()));
+        l.setDayString(table.getValueAt(currentRow, 5).toString());
+        l.setThoiGian(table.getValueAt(currentRow, 6).toString());
+        l.setKiHoc(sinhVien.getSchoolYear());
+        if(new TkbDAO().CapNhapTkb(l))
+        {
+            JOptionPane.showMessageDialog(null, "Cáº­p nháº­p thá»?i khÃ³a biá»ƒu thÃ nh cÃ´ng !");
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "TrÃ¹ng lá»‹ch há»?c vá»›i mÃ´n khÃ¡c hoáº·c mÃ´n há»?c Ä‘Ã£ Ä‘Æ°á»£c Ä‘Äƒng kÃ­");
+        }
+    }
+
+    // @Override // Bá»Š XÃ“A: KhÃ´ng tÆ°Æ¡ng thÃ­ch JDK 1.4
+    protected void fireEditingStopped() {
+        super.fireEditingStopped(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+    
+}
